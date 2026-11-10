@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEAR Watchtower — an interactive network-health agent</title>
+<style>
+body{background:#0d1117;color:#e6edf3;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;margin:0;padding:32px 20px}
+.wrap{max-width:1024px;margin:0 auto} h1{font-size:30px;margin:0 0 6px} h2{font-size:20px;margin:32px 0 10px;border-bottom:1px solid #21262d;padding-bottom:6px}
+.sub{color:#8b949e;font-size:14px;line-height:1.55} code{background:#161b22;padding:1px 5px;border-radius:4px;font-size:12.5px}
+.hero{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;margin-top:18px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:14px}
+.card{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px} .num{font-size:21px;font-weight:700} .lbl{color:#8b949e;font-size:12.5px;margin-top:3px}
+.bar-row{display:flex;align-items:center;gap:10px;margin:7px 0} .bar-name{width:140px;font-size:13.5px}
+.bar-track{flex:1;background:#21262d;border-radius:5px;height:14px} .bar-fill{height:14px;border-radius:5px;transition:width .2s}
+.bar-val{width:44px;font-weight:700;font-size:13.5px}
+.ctl{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px 22px;margin-top:10px}
+.ctl label{font-size:13px;color:#8b949e;display:flex;justify-content:space-between}
+input[type=range]{width:100%} button{background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:7px 12px;cursor:pointer;font-size:13px}
+button:hover{background:#30363d} .alert{background:#2d1a08;border:1px solid #9e6a03;border-radius:8px;padding:10px 14px;margin:6px 0}
+.ok{background:#0f2417;border:1px solid #238636;border-radius:8px;padding:10px 14px}
+li{margin:5px 0;line-height:1.5} .foot{color:#8b949e;font-size:12.5px;margin-top:34px;line-height:1.6}
+pre{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px;overflow-x:auto;font-size:12.5px}
+</style></head><body><div class="wrap">
+<h1>NEAR Watchtower</h1>
+<div class="sub">A network-health agent for NEAR Protocol — and an open lab around it. The agent polls live
+public data, scores the network from evidence, watches its own history for anomalies, and publishes a feed
+(<code>data/status.json</code>) that other agents act on (one does, below). On this page you can also
+<b>re-weight the model yourself</b> and watch the score change: the methodology is inspectable, not a black box.<br>
+Snapshot: 2026-11-09T12:55:15.501635+00:00 · snapshot #2</div>
+
+<div class="hero">
+<div><svg width="220" height="130" viewBox="0 0 220 130"><path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#21262d" stroke-width="14"/><path id="gaugeArc" d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#3fb950" stroke-width="14" stroke-dasharray="235.2 282.7"/>
+<text x="110" y="95" text-anchor="middle" font-size="34" fill="#e6edf3" font-weight="700" id="scoreNum">83.2</text>
+<text x="110" y="118" text-anchor="middle" font-size="13" font-weight="700" id="scoreLbl" fill="#3fb950">STRONG</text></svg>
+<div class="sub" style="text-align:center">live-recomputed as you move the controls</div></div>
+<div style="flex:1;min-width:280px"><h2 style="margin-top:0;border:none">Health components</h2><div class="bar-row"><span class="bar-name">Cadence</span><div class="bar-track"><div class="bar-fill" id="bar-cadence" style="width:95%;background:#3fb950"></div></div><span class="bar-val" id="val-cadence">95.2</span></div><div class="bar-row"><span class="bar-name">Decentralization</span><div class="bar-track"><div class="bar-fill" id="bar-decentralization" style="width:60%;background:#d29922"></div></div><span class="bar-val" id="val-decentralization">60.0</span></div><div class="bar-row"><span class="bar-name">Staking</span><div class="bar-track"><div class="bar-fill" id="bar-staking" style="width:74%;background:#d29922"></div></div><span class="bar-val" id="val-staking">73.8</span></div><div class="bar-row"><span class="bar-name">Throughput</span><div class="bar-track"><div class="bar-fill" id="bar-throughput" style="width:100%;background:#3fb950"></div></div><span class="bar-val" id="val-throughput">100.0</span></div><div class="bar-row"><span class="bar-name">Liquidity</span><div class="bar-track"><div class="bar-fill" id="bar-liquidity" style="width:97%;background:#3fb950"></div></div><span class="bar-val" id="val-liquidity">96.9</span></div></div>
+</div>
+
+<h2>Alerts from this snapshot</h2>
+<div class="ok">No alerts this snapshot — every component is within its normal band.</div>
+
+<h2>Score history</h2>
+<svg width="100%" viewBox="0 0 640 90" style="background:#161b22;border:1px solid #21262d;border-radius:8px"><polyline points="8,18 632,18" fill="none" stroke="#3fb950" stroke-width="2"/></svg><div class="sub">2 committed snapshots — the agent's own time series (data/history.jsonl). First: 2026-11-09T12:54Z · latest: 2026-11-09T12:55Z.</div>
+
+<h2>The lab — re-weight the model</h2>
+<div class="sub">Weights are policy. The defaults are the published ones (decentralization counts most, at 25%).
+Drag them, or try a preset, and the gauge, bars and score above recompute instantly from the same evidence.
+Reset restores the author's published model.</div>
+<div class="ctl" id="weightCtls"></div>
+<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+<button onclick="preset('author')">Author's model</button>
+<button onclick="preset('decentralization')">Decentralization maximalist</button>
+<button onclick="preset('markets')">Markets only</button>
+<button onclick="preset('equal')">Equal weights</button>
+</div>
+<div class="sub" style="margin-top:8px" id="labNote"></div>
+
+<h2>Another agent, acting on this feed</h2>
+<div class="cards"><div class="card" style="grid-column:1/-1"><div class="num" style="font-size:17px">Demo treasury agent → 70% growth / 30% reserve</div><div class="lbl">SIMULATION — no real funds. Decision by agent_consumer.py from this feed (label STRONG, 83.2/100).</div><ul style="margin:8px 0 0;padding-left:18px"><li>health 83.2/100 -> STRONG, base growth share 70%</li><li>weakest component: decentralization (60.0/100)</li></ul></div></div>
+
+<h2>The evidence</h2>
+<div class="cards"><div class="card"><div class="num">$3.57</div><div class="lbl">NEAR price (USD)</div></div><div class="card"><div class="num">$4,682,467,760</div><div class="lbl">Market cap</div></div><div class="card"><div class="num">-82.5%</div><div class="lbl">vs all-time high $20.44</div></div><div class="card"><div class="num">339</div><div class="lbl">Validators in the live set</div></div><div class="card"><div class="num">9</div><div class="lbl">Nakamoto coefficient</div></div><div class="card"><div class="num">44.31%</div><div class="lbl">Of supply staked</div></div><div class="card"><div class="num">5.7% / 36.2%</div><div class="lbl">Largest pool / top-10 share of stake</div></div><div class="card"><div class="num">5,478,061,250</div><div class="lbl">Lifetime transactions</div></div><div class="card"><div class="num">0.571s</div><div class="lbl">Average block time</div></div><div class="card"><div class="num">151,208</div><div class="lbl">Blocks per day (est.)</div></div><div class="card"><div class="num">11.63%</div><div class="lbl">24h volume / market cap</div></div><div class="card"><div class="num">223,769,779</div><div class="lbl">Latest block height</div></div></div>
+
+<h2>How another agent uses this</h2>
+<pre>GET data/status.json
+{
+  "health_score": 83.2, "health_label": "STRONG",
+  "components": { "cadence": ..., "decentralization": ..., "staking": ..., "throughput": ..., "liquidity": ... },
+  "alerts": [ { "component": "...", "kind": "z_score | low_component | label_change", "detail": "..." } ],
+  "evidence": { "nakamoto_coefficient": 9, "staked_pct_of_supply": 44.31, ... },
+  "generated_at": "2026-11-09T12:55:15.501635+00:00"
+}</pre>
+
+<h2>Method &amp; sources</h2>
+<ul>
+<li>NearBlocks API — supply, price, market cap, volume, lifetime transactions, nodes online, block time.</li>
+<li>NEAR mainnet RPC — chain status and the live validator set; stake shares and the Nakamoto coefficient are summed directly.</li>
+<li>CoinGecko — market data cross-check (price, market cap, ATH).</li>
+<li>Alerts: any component under 40 flags immediately; label changes flag; with ≥5 snapshots of history,
+components also flag at |z| ≥ 2 against their own history.</li>
+<li>Full methodology, weights rationale and limitations: the repository README. Raw responses: <code>data/snapshot_raw.json</code>.</li>
+</ul>
+
+<div class="foot">Re-run the whole system yourself: <code>python3 watchtower.py &amp;&amp; python3 agent_consumer.py &amp;&amp; python3 build_dashboard.py</code> — Python 3 standard library only, no API keys.<br>
+Built by team zarroww for the NEAR Hackathon (Agent Economy track). Sibling project: <i>NEAR by the Numbers</i>, a re-runnable investment-thesis model. Research and education only — not financial advice.</div>
+</div>
+<script>
+const FEED = {"evidence": {"price_usd": 3.57, "market_cap_usd": 4682467760, "volume_24h_usd": 544453017, "ath_usd": 20.44, "drawdown_from_ath_pct": -82.53, "circulating_supply": 1249836992.159308, "total_supply": 1311241559.0614462, "validators": 339, "nakamoto_coefficient": 9, "total_staked_near": 580980505.8, "staked_pct_of_supply": 44.31, "top1_pool_pct_of_stake": 5.71, "top10_pools_pct_of_stake": 36.25, "lifetime_transactions": 5478061250, "nodes_online": 371, "avg_block_time_s": 0.5714, "blocks_per_day_est": 151208, "volume_over_market_cap_pct": 11.63, "latest_block_height": 223769779}, "weights": {"cadence": 0.2, "decentralization": 0.25, "staking": 0.2, "throughput": 0.15, "liquidity": 0.2}, "targets": {"cadence_s": 0.6, "nakamoto": 15, "staked_pct": 60.0, "blocks_day": 144000, "turnover_pct": 12.0}};
+const EV = FEED.evidence;
+const KEYS = ["cadence","decentralization","staking","throughput","liquidity"];
+let W = {...FEED.weights};
+const T = FEED.targets;
+function components(){
+  const cadence = Math.max(0, Math.min(100, 100 - Math.abs(EV.avg_block_time_s - T.cadence_s)/T.cadence_s*100));
+  const decentr = Math.max(0, Math.min(100, EV.nakamoto_coefficient / T.nakamoto * 100));
+  const staking = Math.max(0, Math.min(100, EV.staked_pct_of_supply / T.staked_pct * 100));
+  const through = Math.max(0, Math.min(100, EV.blocks_per_day_est / T.blocks_day * 100));
+  const liquid  = Math.max(0, Math.min(100, EV.volume_over_market_cap_pct / T.turnover_pct * 100));
+  return {cadence, decentralization: decentr, staking, throughput: through, liquidity: liquid};
+}
+function color(v){ return v>=75 ? "#3fb950" : v>=55 ? "#d29922" : v>=40 ? "#f0883e" : "#f85149"; }
+function label(v){ return v>=75 ? "STRONG" : v>=55 ? "STEADY" : v>=40 ? "FRAGILE" : "CRITICAL"; }
+function render(){
+  const C = components();
+  const tot = KEYS.reduce((a,k)=>a+W[k],0) || 1;
+  let s = 0; KEYS.forEach(k=>{ s += C[k]*W[k]/tot;
+    document.getElementById("bar-"+k).style.width = C[k].toFixed(0)+"%";
+    document.getElementById("bar-"+k).style.background = color(C[k]);
+    document.getElementById("val-"+k).textContent = C[k].toFixed(1);
+    document.getElementById("wv-"+k).textContent = Math.round(W[k]/tot*100)+"%";
+  });
+  const L = Math.PI*90;
+  const arcEl = document.getElementById("gaugeArc");
+  arcEl.setAttribute("stroke-dasharray", (s/100*L).toFixed(1)+" "+L.toFixed(1));
+  arcEl.setAttribute("stroke", color(s));
+  document.getElementById("scoreNum").textContent = s.toFixed(1);
+  const lbl = document.getElementById("scoreLbl");
+  lbl.textContent = label(s); lbl.setAttribute("fill", color(s));
+  document.getElementById("labNote").textContent =
+    "With these weights the score is " + s.toFixed(1) + " (" + label(s) + "). The evidence never changes — only the judgement applied to it.";
+}
+const ctl = document.getElementById("weightCtls");
+KEYS.forEach(k=>{
+  const d = document.createElement("div");
+  d.innerHTML = '<label><span>'+k+'</span><span id="wv-'+k+'"></span></label>'+
+    '<input type="range" min="0" max="50" value="'+Math.round(W[k]*100)+'" id="w-'+k+'">';
+  ctl.appendChild(d);
+  d.querySelector("input").addEventListener("input", e=>{ W[k] = e.target.value/100; render(); });
+});
+function preset(name){
+  if(name==="author") W = {...FEED.weights};
+  if(name==="decentralization") W = {cadence:.05, decentralization:.70, staking:.10, throughput:.05, liquidity:.10};
+  if(name==="markets") W = {cadence:.05, decentralization:.05, staking:.10, throughput:.05, liquidity:.75};
+  if(name==="equal") W = {cadence:.2, decentralization:.2, staking:.2, throughput:.2, liquidity:.2};
+  KEYS.forEach(k=>{ document.getElementById("w-"+k).value = Math.round(W[k]*100); });
+  render();
+}
+render();
+</script>
+</body></html>

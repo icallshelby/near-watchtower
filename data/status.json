@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-11-09T12:55:15.501635+00:00",
+  "agent": "near-watchtower",
+  "version": 2,
+  "network": "NEAR mainnet",
+  "health_score": 83.2,
+  "health_label": "STRONG",
+  "components": {
+    "cadence": 95.2,
+    "decentralization": 60.0,
+    "staking": 73.8,
+    "throughput": 100.0,
+    "liquidity": 96.9
+  },
+  "weights": {
+    "cadence": 0.2,
+    "decentralization": 0.25,
+    "staking": 0.2,
+    "throughput": 0.15,
+    "liquidity": 0.2
+  },
+  "targets": {
+    "cadence_s": 0.6,
+    "nakamoto": 15,
+    "staked_pct": 60.0,
+    "blocks_day": 144000,
+    "turnover_pct": 12.0
+  },
+  "alerts": [],
+  "history_snapshots": 2,
+  "evidence": {
+    "price_usd": 3.57,
+    "market_cap_usd": 4682467760,
+    "volume_24h_usd": 544453017,
+    "ath_usd": 20.44,
+    "drawdown_from_ath_pct": -82.53,
+    "circulating_supply": 1249836992.159308,
+    "total_supply": 1311241559.0614462,
+    "validators": 339,
+    "nakamoto_coefficient": 9,
+    "total_staked_near": 580980505.8,
+    "staked_pct_of_supply": 44.31,
+    "top1_pool_pct_of_stake": 5.71,
+    "top10_pools_pct_of_stake": 36.25,
+    "lifetime_transactions": 5478061250,
+    "nodes_online": 371,
+    "avg_block_time_s": 0.5714,
+    "blocks_per_day_est": 151208,
+    "volume_over_market_cap_pct": 11.63,
+    "latest_block_height": 223769779
+  },
+  "sources": [
+    "https://api.nearblocks.io/v1/stats",
+    "https://rpc.mainnet.near.org (status, validators)",
+    "https://api.coingecko.com/api/v3/coins/near"
+  ]
+}
